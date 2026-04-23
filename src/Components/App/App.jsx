@@ -29,24 +29,47 @@ function App () {
       name: 'Example Playlist Name 1',
       artist: 'Example Playlist Artist 1',
       album: 'Example Playlist Album1',
-      id: 1,
-    },
-     {
-      name: 'Example Playlist Name 1',
-      artist: 'Example Playlist Artist 1',
-      album: 'Example Playlist Album1',
-      id: 2,
-    },
-     {
-      name: 'Example Playlist Name 1',
-      artist: 'Example Playlist Artist 1',
-      album: 'Example Playlist Album1',
       id: 3,
+    },
+     {
+      name: 'Example Playlist Name 1',
+      artist: 'Example Playlist Artist 1',
+      album: 'Example Playlist Album1',
+      id: 4,
+    },
+     {
+      name: 'Example Playlist Name 1',
+      artist: 'Example Playlist Artist 1',
+      album: 'Example Playlist Album1',
+      id: 5,
     }
   ])
 
   const addTrack = (track) => {
-    searchResults.find(t => t.id === track.id)
+    const existingTrack = playlistTracks.find((t) => t.id === track.id);
+    const newTrack = playlistTracks.concat(track);
+    if (existingTrack) {
+      console.log('track already exists')
+    } else {
+      setPlaylistTracks(newTrack);
+    }
+  }
+
+  const removeTrack = (track) => {
+    const exsistingTrack = playlistTracks.filter((t) => t.id !== track.id)
+    setPlaylistTracks(exsistingTrack)
+  }
+
+  const updatePlaylistName = (name) => {
+    setPlaylistName(name);
+  }
+
+  const savePlaylist = () => {
+    const trackURIs = playlistTracks.map((t) => t.uri)
+  }
+
+  const search = (term) => {
+    console.log(term)
   }
     return (
         <div>
@@ -54,11 +77,10 @@ function App () {
           Ja<span className="highlight">mmm</span>ing
         </h1>
         <div className="App">
-          {/* <!-- Add a SearchBar component --> */}
-          
+          <SearchBar onSearch={search}/>
           <div className="App-playlist">
-            <SearchResults userSearchResults={searchResults}/>
-            <Playlist playlistName={playlistName} playlistTracks={playlistTracks}/>
+            <SearchResults userSearchResults={searchResults} onAdd={addTrack}/>
+            <Playlist playlistName={playlistName} playlistTracks={playlistTracks} onRemove={removeTrack} onNameChange={updatePlaylistName} onSave={savePlaylist}/>
           </div>
         </div>
       </div>
