@@ -91,7 +91,7 @@ const Spotify = {
       `client_id=${clientId}` +
       `&response_type=code` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&scope=playlist-modify-public` +
+      `&scope=playlist-modify-public%20playlist-modify-private` +
       `&code_challenge_method=S256` +
       `&code_challenge=${codeChallenge}`;
 
@@ -124,32 +124,36 @@ const Spotify = {
   async savePlaylist(name, trackUris) {
     if (!name || !trackUris) return;
     const aToken = await Spotify.getAccessToken();
-    const header = { Authorization: `Bearer ${aToken}` };
-    let userId;
-    return fetch(`https://api.spotify.com/v1/me`, { headers: header })
-      .then((response) => response.json())
-      .then((jsonResponse) => {
-        userId = jsonResponse.id;
-        let playlistId;
-        return fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
-          headers: header,
-          method: "POST",
-          body: JSON.stringify({ name: name }),
-        })
-          .then((response) => response.json())
-          .then((jsonResponse) => {
-            playlistId = jsonResponse.id;
-            return fetch(
-              `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-              {
-                headers: header,
-                method: "POST",
-                body: JSON.stringify({ uris: trackUris }),
-              }
-            );
-          });
-      });
+    const headers = { 
+      Authorization: `Bearer ${aToken}`,
+      "Content-Type": "application/json"
+    };
+
+    const playlistResponse = await fetch(`https://api.spotify.com/v1/me/playlists`, {
+      headers,
+      method: "POST",
+      body: JSON.stringify({ name: name }),
+    });
+
+    const playlistData = await playlistResponse.json();
+    const playlistId = playlistData.id;
+
+    return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      headers,
+      method: "POST",
+      body: JSON.stringify({ uris: trackUris }),
+    });
+
+       const tracksData = await tracksResponse.json();
+    console.log('Tracks response:', tracksData); // 👈 add this
+
   },
+
+  async savePlaylist(name, trackUris) {
+    console.log('Saving playlist:', name);
+    console.log('Track URIs:', trackUris); // 👈 check this
+    if (!name || !trackUris) return;
+  }
 };
 
 export { Spotify };
